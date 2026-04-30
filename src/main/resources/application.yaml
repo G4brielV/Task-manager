@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: task-manager
+  datasource:
+    # Configuracoes do Banco de Dados Postgresql
+    url: jdbc:postgresql://localhost:5433/task_manager
+    username: postgres
+    password: SenhaSQL
+api:
+  security:
+    token:
+      secret: ${JWT_Secret:SenhaTokenSuperSecreta}
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: method
