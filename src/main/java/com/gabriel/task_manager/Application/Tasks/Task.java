@@ -11,9 +11,10 @@ import java.time.LocalDateTime;
 @Table(name = "tasks")
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of="id")
+@EqualsAndHashCode(of = "id")
 public class Task {
 
     @Id

@@ -2,8 +2,7 @@ spring:
   application:
     name: task-manager
   datasource:
-    # Configuracoes do Banco de Dados Postgresql
-    url: jdbc:postgresql://localhost:5433/task_manager
+    url: jdbc:postgresql://localhost:5433/task_manager?stringtype=unspecified
     username: postgres
     password: SenhaSQL
 api:
