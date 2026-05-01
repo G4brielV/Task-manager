@@ -1,16 +1,7 @@
 package com.gabriel.task_manager.Application.Users;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 
 @Builder
@@ -33,6 +24,10 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    private String senha;
+    private String password;
+
+    public void atualizarSenha(String senhaCriptografada) {
+        this.password = senhaCriptografada;
+    }
 
 }

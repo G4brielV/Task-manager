@@ -11,7 +11,7 @@ public class UserMapper {
         return User.builder()
                 .name(dto.name())
                 .email(dto.email())
-                .senha(dto.senha())
+                .password(dto.password())
                 .build();
     }
 
