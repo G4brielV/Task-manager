@@ -114,7 +114,8 @@ frontend/
 - A tarefa deve refletir o status **Atrasado** (`OVERDUE`) quando a data atual for maior do que a data limite.
   - O sistema verifica isso na **inserção e edição** de uma task: Se `due_date < today` e `status ≠ COMPLETED`, então o status passa a ser `OVERDUE`.
   - Existe um `Scheduled async` que roda todo dia garantindo a atualização consistente no banco. Toda tarefa incompleta com `due_date < today` é marcada como `OVERDUE`.
-  - *Possível melhoria:* Otimizar esse processo utilizando Virtual Threads em versões mais atuais do Java (como Java 21).
+  - *Problema da solução:* Definir quando o Scheduled deve rodar, pois em escala global é dificil dizer quando é o fim do dia, qual fuso tomar de parâmetro.
+  - *Possível melhoria:* Otimizar esse processo utilizando Virtual Threads em versões mais atuais do Java (como Java 21)
 
 ---
 
