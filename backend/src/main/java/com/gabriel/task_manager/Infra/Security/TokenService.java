@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 public class TokenService {
 
-    @Value("{$api.security.token.secret}")
+    @Value("${api.security.token.secret}")
     private String secret;
 
     public String gerarToken(User user){

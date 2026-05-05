@@ -26,7 +26,7 @@ public class AuthService {
 
 
     public LoginResponse login(@RequestBody @Valid LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.senha());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password());
         Authentication autenticacao = authenticationManager.authenticate(token);
         User user = (User) autenticacao.getPrincipal();
         String tokenJWT = tokenService.gerarToken(user);
