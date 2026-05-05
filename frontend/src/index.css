@@ -4,6 +4,6 @@
   box-sizing: border-box;
 }
 body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f4f6f8; /* Um cinza bem claro, padrão de painéis */
+  font-family: 'Inter', Arial, sans-serif;
+  background-color: #f4f6f8; /* light gray background for app */
 }

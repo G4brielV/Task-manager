@@ -1,57 +1,61 @@
 import React, { createContext, useState, useContext, useEffect, type ReactNode } from 'react';
 import { authService } from '../services/authService';
-import type { LoginRequest } from '../types/auth';
+import type { LoginRequest, RegisterRequest } from '../types/auth';
 
-// Contexto vai fornecer para as telas
+// Contexto de autenticação para gerenciar o estado do token JWT
 interface AuthContextData {
   isAuthenticated: boolean;
   token: string | null;
+  loading: boolean;
   signIn: (data: LoginRequest) => Promise<void>;
+  register: (data: RegisterRequest) => Promise<void>;
   signOut: () => void;
 }
 
-// Contexto
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
-// Tipagem das props do Provider (que vai envolver os filhos/rotas)
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-// Provider que gerencia o estado
+// Gerencia o estado de autenticação e token JWT, persistindo-o no localStorage
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Ao abrir o app para buscar o token salvo
+  // Verifica se ja existe token
   useEffect(() => {
-    const storagedToken = localStorage.getItem('@taskmanager:token');
-    if (storagedToken) {
-      setToken(storagedToken);
+    const storedToken = localStorage.getItem('@taskmanager:token');
+    if (storedToken) {
+      setToken(storedToken);
     }
+    setLoading(false);
   }, []);
 
   const signIn = async (data: LoginRequest) => {
-    try {
-      const jwtToken = await authService.login(data);
-      localStorage.setItem('@taskmanager:token', jwtToken);
-      setToken(jwtToken);
-    } catch (error) {
-      console.error('Erro ao realizar login:', error);
-      throw error; 
-    }
+    const jwtToken = await authService.login(data);
+    localStorage.setItem('@taskmanager:token', jwtToken);
+    setToken(jwtToken);
   };
+
+  const register = async (data: RegisterRequest) => {
+    await authService.register(data);
+  };
+
   const signOut = () => {
     localStorage.removeItem('@taskmanager:token');
     setToken(null);
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        isAuthenticated: !!token, 
-        token, 
-        signIn, 
-        signOut 
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: !!token,
+        token,
+        loading,
+        signIn,
+        register,
+        signOut,
       }}
     >
       {children}
@@ -62,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+    throw new Error('useAuth must be used inside an AuthProvider');
   }
   return context;
 };
