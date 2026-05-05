@@ -1,11 +1,11 @@
 services:
   db:
     image: postgres:15-alpine
-    container_name: DB-TaskManager
+    container_name: taskmanager_db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: SenhaSQL
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: SENHA_SQL
       POSTGRES_DB: task_manager
     ports:
       - "5433:5432"

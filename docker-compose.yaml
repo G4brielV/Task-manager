@@ -1,0 +1,54 @@
+services:
+  # 1. Banco de Dados
+  db:
+    image: postgres:15-alpine
+    container_name: taskmanager_db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: SENHA_SQL
+      POSTGRES_DB: task_manager
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-TaskManager
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  # 2. Backend (Java/Spring)
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskmanager_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/task_manager
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=SENHA_SQL
+    depends_on:
+      - db
+
+  # 3. Frontend (React/Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: taskmanager_frontend
+    ports:
+      - "5173:80" 
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data: 
