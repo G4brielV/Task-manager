@@ -26,7 +26,7 @@ public class AuthService {
 
 
     public LoginResponse login(@RequestBody @Valid LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password());
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(loginRequest.email().toLowerCase(), loginRequest.password());
         Authentication autenticacao = authenticationManager.authenticate(token);
         User user = (User) autenticacao.getPrincipal();
         String tokenJWT = tokenService.gerarToken(user);
@@ -35,7 +35,7 @@ public class AuthService {
 
     @Transactional
     public RegisterResponse register(@RequestBody @Valid RegisterRequest registerRequest) {
-        if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
+        if (userRepository.findByEmail(registerRequest.email().toLowerCase()).isPresent()) {
             throw new BusinessRuleException("Já existe um usuário cadastrado com este login.");
         }
         User user = UserMapper.toUser(registerRequest);

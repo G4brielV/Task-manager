@@ -10,7 +10,7 @@ public class UserMapper {
     public User toUser(RegisterRequest dto) {
         return User.builder()
                 .name(dto.name())
-                .email(dto.email())
+                .email(dto.email().toLowerCase())
                 .password(dto.password())
                 .build();
     }
@@ -19,7 +19,7 @@ public class UserMapper {
         return RegisterResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .email(user.getEmail())
+                .email(user.getEmail().toLowerCase())
                 .build();
     }
 }
