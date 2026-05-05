@@ -14,7 +14,6 @@ export interface RegisterRequest {
     password: string;
 }
 
-//(Ajuste as propriedades caso seu backend retorne algo específico além do status 201)
 export interface RegisterResponse {
     id: number;
     name: string;

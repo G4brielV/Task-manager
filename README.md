@@ -158,6 +158,7 @@ Todas as atividades realizadas com o auxílio de IA foram revisadas para que con
 - Geração do **GlobalExceptionHandler** para tratamento padronizado de erros.
 - Ajuste e incremento da **documentação com Swagger**.
 - Ajuste das queries de filtros com o JPA, utilizando a interface **Specification**.
+- Mapeamento basico das entidades e DTOs do Backend para o Frontend
 - Melhoria das telas e componentes
 - Configuração do **NGINX** como proxy reverso.
 - Geração dos arquivos **Dockerfile** e do **docker-compose** final para compilação e execução no Docker.
