@@ -4,8 +4,8 @@ CREATE TABLE tasks (
     description TEXT,
     status VARCHAR(30) NOT NULL,
     assignee_id  BIGINT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    due_date TIMESTAMP,
+    created_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    due_date DATE NOT NULL,
 
     CONSTRAINT fk_task_user FOREIGN KEY (assignee_id ) REFERENCES users(id)
 );

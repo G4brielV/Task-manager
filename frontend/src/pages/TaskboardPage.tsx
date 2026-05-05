@@ -61,7 +61,7 @@ const TaskboardPage: React.FC = () => {
         search: search || undefined,
         page: page - 1, // Spring pages are 0-indexed
         size,
-        sort: 'createdAt,desc',
+        sort: 'createdDate,desc',
       };
       const res = await taskService.getTasks(params);
       setTasks(res.content);
@@ -126,9 +126,10 @@ const TaskboardPage: React.FC = () => {
     try {
       await taskService.updateTaskStatus(id, { status: newStatus });
       await fetchTasks();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error changing status:', err);
-      setError('Erro ao alterar status.');
+      const backendMsg = err?.response?.data?.message;
+      setError(backendMsg || 'Erro ao alterar status.');
     }
   };
 

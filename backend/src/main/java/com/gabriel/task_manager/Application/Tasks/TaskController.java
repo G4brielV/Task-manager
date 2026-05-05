@@ -41,7 +41,7 @@ public class TaskController {
                     @Parameter(name = "search",  description = "Busca por texto no título ou descrição"),
                     @Parameter(name = "page",    description = "Número da página (padrão 0)"),
                     @Parameter(name = "size",    description = "Tamanho da página (padrão 10)"),
-                    @Parameter(name = "sort",    description = "Ordenação (ex: createdAt,desc)")
+                    @Parameter(name = "sort",    description = "Ordenação (ex: createdDate,desc)")
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Lista paginada de tarefas"),
@@ -53,7 +53,7 @@ public class TaskController {
             @AuthenticationPrincipal JWTUserData jwtUserData,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) String search,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<TaskResponse> page = taskService.listTasks(jwtUserData, status, search, pageable);
         return ResponseEntity.ok(page);
@@ -79,7 +79,8 @@ public class TaskController {
 
     @Operation(
             summary = "Criar uma nova tarefa",
-            description = "Cria uma tarefa associada ao usuário autenticado. O status inicial é TO_DO.",
+            description = "Cria uma tarefa associada ao usuário autenticado. O status inicial é TO_DO, " +
+                          "a menos que a data de vencimento já esteja no passado (nesse caso, será OVERDUE).",
             responses = {
                     @ApiResponse(
                             responseCode = "201",
@@ -103,7 +104,9 @@ public class TaskController {
 
     @Operation(
             summary = "Editar uma tarefa",
-            description = "Atualiza título, descrição e data de vencimento de uma tarefa do usuário autenticado.",
+            description = "Atualiza título, descrição e data de vencimento de uma tarefa do usuário autenticado. " +
+                          "Se a nova data de vencimento estiver no passado e o status não for COMPLETED, " +
+                          "o status será automaticamente definido como OVERDUE.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Tarefa atualizada com sucesso"),
                     @ApiResponse(responseCode = "403", description = "Tarefa não pertence ao usuário", content = @Content),
@@ -123,12 +126,14 @@ public class TaskController {
 
     @Operation(
             summary = "Alterar o status de uma tarefa",
-            description = "Permite mudar apenas o campo status de uma tarefa pertencente ao usuário autenticado.",
+            description = "Permite mudar apenas o campo status de uma tarefa pertencente ao usuário autenticado. " +
+                          "Transições inválidas retornarão HTTP 400. O status OVERDUE não pode ser definido manualmente.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Status atualizado com sucesso"),
-                    @ApiResponse(responseCode = "403", description = "Tarefa não pertence ao usuário", content = @Content),
+                    @ApiResponse(responseCode = "400", description = "Transição de status inválida",    content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Tarefa não pertence ao usuário",  content = @Content),
                     @ApiResponse(responseCode = "404", description = "Tarefa não encontrada",           content = @Content),
-                    @ApiResponse(responseCode = "422", description = "Status inválido",                content = @Content)
+                    @ApiResponse(responseCode = "422", description = "Status inválido",                 content = @Content)
             }
     )
     @PatchMapping("/{id}/status")
@@ -139,5 +144,23 @@ public class TaskController {
     ) {
         TaskResponse response = taskService.updateStatus(jwtUserData, id, request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "Excluir uma tarefa",
+            description = "Remove permanentemente uma tarefa pertencente ao usuário autenticado.",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Tarefa excluída com sucesso"),
+                    @ApiResponse(responseCode = "403", description = "Tarefa não pertence ao usuário", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Tarefa não encontrada",           content = @Content)
+            }
+    )
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(
+            @AuthenticationPrincipal JWTUserData jwtUserData,
+            @PathVariable Long id
+    ) {
+        taskService.deleteTask(jwtUserData, id);
+        return ResponseEntity.noContent().build();
     }
 }

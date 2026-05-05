@@ -11,21 +11,7 @@ interface Props {
 
 const toInputValue = (iso?: string) => {
   if (!iso) return '';
-  const d = new Date(iso);
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  const yyyy = d.getFullYear();
-  const mm = pad(d.getMonth() + 1);
-  const dd = pad(d.getDate());
-  const hh = pad(d.getHours());
-  const min = pad(d.getMinutes());
-  return `${yyyy}-${mm}-${dd}T${hh}:${min}`;
-};
-
-const formatForBackend = (localValue: string) => {
-  if (!localValue) return undefined;
-  // if contains minutes only (YYYY-MM-DDTHH:mm) append seconds
-  if (localValue.length === 16) return `${localValue}:00`;
-  return localValue;
+  return iso.substring(0, 10);
 };
 
 const TaskFormDialog: React.FC<Props> = ({ open, initial, onClose, onSubmit }) => {
@@ -34,9 +20,11 @@ const TaskFormDialog: React.FC<Props> = ({ open, initial, onClose, onSubmit }) =
   const [dueDate, setDueDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [touchedTitle, setTouchedTitle] = useState(false);
+  const [touchedDueDate, setTouchedDueDate] = useState(false);
 
   useEffect(() => {
     setTouchedTitle(false);
+    setTouchedDueDate(false);
     if (initial) {
       setTitle(initial.title || '');
       setDescription(initial.description || '');
@@ -48,14 +36,21 @@ const TaskFormDialog: React.FC<Props> = ({ open, initial, onClose, onSubmit }) =
     }
   }, [initial, open]);
 
+  const isTitleValid = title.trim().length > 0;
+  const isDueDateValid = dueDate.length > 0;
+  const isFormValid = isTitleValid && isDueDateValid;
+
   const handleSave = async () => {
+    setTouchedTitle(true);
+    setTouchedDueDate(true);
+    if (!isFormValid) return;
+
     setSubmitting(true);
     try {
-      const formatted = formatForBackend(dueDate) ?? null;
       const payload: TaskRequest = {
-        title,
+        title: title.trim(),
         description,
-        dueDate: formatted,
+        dueDate,  // "yyyy-MM-dd"
       };
       await onSubmit(payload);
       onClose();
@@ -71,31 +66,35 @@ const TaskFormDialog: React.FC<Props> = ({ open, initial, onClose, onSubmit }) =
       <DialogTitle>{initial ? 'Editar tarefa' : 'Criar tarefa'}</DialogTitle>
       <DialogContent>
         <Box sx={{ mt: 1 }}>
-          <TextField 
-            label="Título" 
-            value={title} 
-            onChange={(e) => setTitle(e.target.value)} 
-            onBlur={() => setTouchedTitle(true)}
-            error={touchedTitle && !title}
-            helperText={touchedTitle && !title ? 'O título é obrigatório' : ''}
-            fullWidth 
-            margin="normal" 
-            required 
-          />
-          <TextField label="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth margin="normal" multiline rows={3} />
-          <Typography variant="subtitle2" sx={{ mt: 2, mb: 0.5 }}>Data e hora</Typography>
           <TextField
-            type="datetime-local"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
+            label="Título"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => setTouchedTitle(true)}
+            error={touchedTitle && !isTitleValid}
+            helperText={touchedTitle && !isTitleValid ? 'O título é obrigatório' : ''}
             fullWidth
             margin="normal"
+            required
+          />
+          <TextField label="Descrição" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth margin="normal" multiline rows={3} />
+          <Typography variant="subtitle2" sx={{ mt: 2, mb: 0.5 }}>Data de vencimento *</Typography>
+          <TextField
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            onBlur={() => setTouchedDueDate(true)}
+            error={touchedDueDate && !isDueDateValid}
+            helperText={touchedDueDate && !isDueDateValid ? 'A data de vencimento é obrigatória' : ''}
+            fullWidth
+            margin="normal"
+            required
           />
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} disabled={submitting}>Cancelar</Button>
-        <Button onClick={handleSave} variant="contained" disabled={submitting || !title}>{submitting ? 'Salvando...' : 'Salvar'}</Button>
+        <Button onClick={handleSave} variant="contained" disabled={submitting || !isFormValid}>{submitting ? 'Salvando...' : 'Salvar'}</Button>
       </DialogActions>
     </Dialog>
   );

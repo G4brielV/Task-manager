@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -41,21 +43,33 @@ public class TaskService {
         task.setTitle(request.title());
         task.setDescription(request.description());
         task.setDueDate(request.dueDate());
-
+        applyOverdueLogic(task);
         return TaskMapper.toTaskResponse(task);
     }
 
     @Transactional
     public TaskResponse updateStatus(JWTUserData jwtUserData, Long taskId, TaskStatusRequest request) {
         Task task = findTaskOwned(taskId, jwtUserData.id());
+
+        // Validate transition via state machine (throws BusinessRuleException on invalid)
+        TaskStateMachine.validateTransition(task.getStatus(), request.status(), task.getDueDate());
+
         task.setStatus(request.status());
+
         return TaskMapper.toTaskResponse(task);
+    }
+
+    @Transactional
+    public void deleteTask(JWTUserData jwtUserData, Long taskId) {
+        Task task = findTaskOwned(taskId, jwtUserData.id());
+        taskRepository.delete(task);
     }
 
     public TaskResponse getTask(JWTUserData jwtUserData, Long taskId) {
         Task task = findTaskOwned(taskId, jwtUserData.id());
         return TaskMapper.toTaskResponse(task);
     }
+
 
     private Task findTaskOwned(Long taskId, Long userId) {
         Task task = taskRepository.findById(taskId)
@@ -65,5 +79,19 @@ public class TaskService {
             throw new ForbiddenException("Você não tem permissão para acessar esta tarefa");
         }
         return task;
+    }
+
+    /**
+     * - dueDate < now AND status ≠ COMPLETED → OVERDUE
+     * - era OVERDUE AND dueDate ≥ today → TO_DO
+     */
+    private void applyOverdueLogic(Task task) {
+        boolean isPast = task.getDueDate().isBefore(LocalDate.now());
+
+        if (isPast && task.getStatus() != TaskStatus.COMPLETED) {
+            task.setStatus(TaskStatus.OVERDUE);
+        } else if (!isPast && task.getStatus() == TaskStatus.OVERDUE) {
+            task.setStatus(TaskStatus.TO_DO);
+        }
     }
 }

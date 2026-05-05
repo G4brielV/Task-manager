@@ -3,7 +3,7 @@ package com.gabriel.task_manager.Application.Tasks;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Builder
 @Schema(description = "Dados de retorno de uma tarefa")
@@ -24,9 +24,9 @@ public record TaskResponse(
         Long assigneeId,
 
         @Schema(description = "Data de criação")
-        LocalDateTime createdAt,
+        LocalDate createdDate,
 
         @Schema(description = "Data de vencimento")
-        LocalDateTime dueDate
+        LocalDate dueDate
 ) {
 }

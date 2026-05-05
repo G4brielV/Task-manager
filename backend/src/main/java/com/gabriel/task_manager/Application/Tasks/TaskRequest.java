@@ -2,9 +2,10 @@ package com.gabriel.task_manager.Application.Tasks;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Schema(description = "Payload para criação ou edição de uma tarefa")
 public record TaskRequest(
@@ -17,7 +18,8 @@ public record TaskRequest(
         @Schema(description = "Descrição detalhada da tarefa", example = "Verificar a implementação do gateway Stripe")
         String description,
 
-        @Schema(description = "Data de vencimento", example = "2025-12-31T18:00:00")
-        LocalDateTime dueDate
+        @NotNull(message = "A data de vencimento é obrigatória")
+        @Schema(description = "Data de vencimento (formato: yyyy-MM-dd)", example = "2025-12-31")
+        LocalDate dueDate
 ) {
 }

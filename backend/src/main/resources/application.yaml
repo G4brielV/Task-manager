@@ -5,6 +5,9 @@ spring:
     url: jdbc:postgresql://localhost:5433/task_manager?stringtype=unspecified
     username: postgres
     password: SenhaSQL
+  jpa:
+    hibernate:
+      ddl-auto: validate
 api:
   security:
     token:

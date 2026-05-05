@@ -22,7 +22,7 @@ const StatusChip: React.FC<Props> = ({ status, onClick }) => {
       color = 'success';
       break;
     case 'OVERDUE':
-      color = 'warning';
+      color = 'error';
       break;
   }
 

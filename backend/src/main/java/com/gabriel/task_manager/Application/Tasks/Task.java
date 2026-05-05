@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Builder
 @Table(name = "tasks")
@@ -36,9 +36,9 @@ public class Task {
     private User assignee;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_date", nullable = false, updatable = false)
+    private LocalDate createdDate;
 
-    @Column(name = "due_date")
-    private LocalDateTime dueDate;
+    @Column(name = "due_date", nullable = false)
+    private LocalDate dueDate;
 }

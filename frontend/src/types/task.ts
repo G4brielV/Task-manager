@@ -1,4 +1,4 @@
-export type TaskStatus =  'TO_DO' | 'IN_PROGRESS' | 'OVERDUE' | 'COMPLETED';
+export type TaskStatus = 'TO_DO' | 'IN_PROGRESS' | 'OVERDUE' | 'COMPLETED';
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   TO_DO: 'A fazer',
@@ -8,14 +8,21 @@ export const STATUS_LABELS: Record<TaskStatus, string> = {
 };
 
 
+export const ALLOWED_TRANSITIONS: Record<TaskStatus, TaskStatus[]> = {
+  TO_DO: ['IN_PROGRESS', 'COMPLETED'],
+  IN_PROGRESS: ['TO_DO', 'COMPLETED'],
+  OVERDUE: ['COMPLETED'],
+  COMPLETED: ['TO_DO', 'IN_PROGRESS'],
+};
+
 export interface TaskResponse {
-    id: number; 
-    title: string;
-    description?: string;
-    status: TaskStatus;
-    assigneeId: number;
-    createdAt?: string; 
-  dueDate?: string;
+  id: number;
+  title: string;
+  description?: string;
+  status: TaskStatus;
+  assigneeId: number;
+  createdDate?: string;
+  dueDate: string;
 }
 
 export interface GetTasksParams {
@@ -27,11 +34,11 @@ export interface GetTasksParams {
 }
 
 export interface Page<T> {
-  content: T[];          
-  totalElements: number; 
-  totalPages: number;    
-  size: number;          
-  number: number;        
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
   first: boolean;
   last: boolean;
   empty: boolean;
@@ -40,7 +47,7 @@ export interface Page<T> {
 export interface TaskRequest {
   title: string;
   description: string;
-  dueDate?: string | null;
+  dueDate: string;
 }
 
 
