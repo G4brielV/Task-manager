@@ -22,7 +22,7 @@ public class TaskService {
 
     public Page<TaskResponse> listTasks(JWTUserData jwtUserData, TaskStatus status, String search, Pageable pageable) {
         String statusStr = (status != null) ? status.name() : null;
-        return taskRepository.findTasksByFilters(jwtUserData.id(), status, search, pageable)
+        return taskRepository.findTasksByFilters(jwtUserData.id(), statusStr, search, pageable)
                 .map(TaskMapper::toTaskResponse);
     }
 

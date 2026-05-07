@@ -24,7 +24,7 @@ public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificat
                     "AND (CAST(:search AS text) IS NULL OR TRIM(CAST(:search AS text)) = '' OR t.search_vector @@ websearch_to_tsquery('portuguese', CAST(:search AS text)))")
     Page<Task> findTasksByFilters(
             @Param("userId") Long userId,
-            @Param("status") TaskStatus status,
+            @Param("status") String status,
             @Param("search") String search,
             Pageable pageable
     );
