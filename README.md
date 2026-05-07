@@ -5,6 +5,25 @@ O sistema conta com um forte controle de segurança implementando autenticação
 
 ---
 
+## ✨ Destaques Técnicos do Projeto
+
+* 🔒 **Autenticação e Segurança:** * Controle de sessões e rotas protegidas utilizando **Tokens JWT** (JSON Web Token).
+  * Senhas dos usuários recebem criptografia antes de serem persistidas no banco de dados.
+
+* 🛡️ **Tratamento Global de Erros (Exception Handling):** * Implementação de um manipulador de exceções global (`GlobalExceptionHandler` via Controller Advice).
+  * Isso garante que erros internos de negócio (como tentar alterar uma tarefa que não lhe pertence ou passar um status inválido) não vazem a stack trace para o cliente, retornando respostas JSON padronizadas e limpas com o código HTTP adequado (ex: `400 Bad Request`, `403 Forbidden`, `404 Not Found`, `422 Unprocessable Entity`).
+
+* ⏱️ **Processamento Assíncrono (Scheduled Tasks):** * Implementação de uma rotina automática e em background para identificar e marcar tarefas vencidas com o status `OVERDUE`.
+  * *Nota de Arquitetura:* O job está configurado para rodar a cada 1 minuto com o objetivo de **facilitar a validação e testes práticos**. Contudo, como a regra de negócio se baseia em datas (`LocalDate`), para um ambiente produtivo a configuração ideal seria a execução de apenas 1x ao dia (ex: todo dia à meia-noite).
+
+* 🔍 **Alta Performance com Full-Text Search (FTS):** * O tradicional e lento filtro via `LIKE %termo%` foi substituído pelo mecanismo nativo de FTS do PostgreSQL (`tsvector` e `websearch_to_tsquery`).
+  * Isso confere maior precisão (lidando inteligentemente com operadores lógicos e acentuação) e resolve o problema de *Table Scan*, utilizando índices otimizados para garantir buscas em frações de milissegundo, mesmo com o banco crescendo.
+
+* 🐳 **Ambiente 100% Dockerizado:** * Toda a infraestrutura do projeto (Backend em Spring, Frontend em React e o Banco de Dados PostgreSQL) está conteinerizada.
+  * Através do `docker-compose`, é possível provisionar todo o ecossistema com um único comando, eliminando o clássico problema de "na minha máquina funciona" e dispensando a instalação prévia de SDKs e bancos locais.
+
+---
+
 ## 📋 Sumário
 
 - [Screenshots](#-screenshots)
@@ -109,8 +128,7 @@ frontend/
 - Ao marcar uma tarefa como "Concluído", a tarefa deve refletir esse estado corretamente.
   - Cada status é indicado por uma **cor específica** no front-end.
 - O filtro por status deve funcionar corretamente e a **busca deve considerar o título e a descrição**.
-  - Implementação de **filtragem com parâmetros e paginação**.
-    - *Possível melhoria:* FullTextSearch com uso de índices GIN/GIST na coluna para otimizar a indexação.
+  - Implementação de **filtragem com parâmetros e paginação** utilizando de *FullTextSearch* 
 - A tarefa deve refletir o status **Atrasado** (`OVERDUE`) quando a data atual for maior do que a data limite.
   - O sistema verifica isso na **inserção e edição** de uma task: Se `due_date < today` e `status ≠ COMPLETED`, então o status passa a ser `OVERDUE`.
   - Existe um `Scheduled async` que roda todo dia garantindo a atualização consistente no banco. Toda tarefa incompleta com `due_date < today` é marcada como `OVERDUE`.
@@ -147,7 +165,7 @@ frontend/
 | `search`  | String  | Pesquisa in title ou description           |
 | `page`    | Integer | Número da página (0-indexed, default: 0)      |
 | `size`    | Integer | Tamanho da página (default: 10)                  |
-| `sort`    | String  | Ordenamento (default: createdAt,desc) |
+| `sort`    | String  | Ordenamento (default: created_date,desc) |
 
 ---
 
@@ -163,6 +181,7 @@ Todas as atividades realizadas com o auxílio de IA foram revisadas para que con
 - Melhoria das telas e componentes
 - Configuração do **NGINX** como proxy reverso.
 - Geração dos arquivos **Dockerfile** e do **docker-compose** final para compilação e execução no Docker.
+- Melhorias no código e script do FULLTEXTSEARCH
 - Criação do **README**
 
 ---
@@ -170,7 +189,6 @@ Todas as atividades realizadas com o auxílio de IA foram revisadas para que con
 ## 📰 Possíveis Futuras Melhorias
 
 - **Swap and drop**: Implementar ordenamento arrastando e soltando tarefas.
-- **FULLTEXTSEARCH**: Melhorar a performance das consultas com operadores `"% "`, `"AND"` e `"LIKE"` direto no banco.
 - **SCHEDULED**: Utilizar **Virtual Threads** ou até mesmo criar um **serviço separado** dedicado apenas à rotina de verificação de atrasos.
 
 ---
