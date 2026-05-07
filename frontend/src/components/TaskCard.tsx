@@ -26,7 +26,16 @@ const TaskCard: React.FC<Props> = ({ task, onEdit, onDelete, onChangeStatus }) =
     ? new Date(task.dueDate + 'T00:00:00').toLocaleDateString()
     : '—';
 
-  const allowedNext = ALLOWED_TRANSITIONS[task.status] ?? [];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dueObj = task.dueDate ? new Date(task.dueDate + 'T00:00:00') : null;
+  if (dueObj) dueObj.setHours(0, 0, 0, 0);
+  
+  let allowedNext = ALLOWED_TRANSITIONS[task.status] ?? [];
+
+  if (dueObj && dueObj < today) {
+    allowedNext = allowedNext.filter((s) => s !== 'TO_DO' && s !== 'IN_PROGRESS');
+  }
 
   const handleStatusChange = (e: SelectChangeEvent<string>) => {
     const newStatus = e.target.value as TaskStatus;

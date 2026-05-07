@@ -39,20 +39,24 @@ public class TaskStateMachine {
             return;
         }
 
+        // Impede mover para TO_DO ou IN_PROGRESS se a data já passou
+        if ((newStatus == TaskStatus.TO_DO || newStatus == TaskStatus.IN_PROGRESS) 
+                && dueDate != null && dueDate.isBefore(LocalDate.now())) {
+            throw new BusinessRuleException(
+                    "Tarefas com data de vencimento no passado não podem ser movidas para TO_DO ou IN_PROGRESS. " +
+                    "Atualize a data de vencimento para uma data futura primeiro."
+            );
+        }
+
         Set<TaskStatus> allowed = ALLOWED.get(currentStatus);
         if (allowed != null && allowed.contains(newStatus)) {
             return;
         }
 
+        // Se era OVERDUE e está tentando ir para TO_DO ou IN_PROGRESS
         if (currentStatus == TaskStatus.OVERDUE
                 && (newStatus == TaskStatus.TO_DO || newStatus == TaskStatus.IN_PROGRESS)) {
-            if (dueDate != null && !dueDate.isBefore(LocalDate.now())) {
-                return; // due date was moved to future, allow
-            }
-            throw new BusinessRuleException(
-                    "Tarefas atrasadas só podem voltar para TO_DO ou IN_PROGRESS " +
-                    "se a data de vencimento for atualizada para uma data futura."
-            );
+            return;
         }
 
         throw new BusinessRuleException(
