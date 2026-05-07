@@ -22,6 +22,10 @@ O sistema conta com um forte controle de segurança implementando autenticação
 * 🐳 **Ambiente 100% Dockerizado:** * Toda a infraestrutura do projeto (Backend em Spring, Frontend em React e o Banco de Dados PostgreSQL) está conteinerizada.
   * Através do `docker-compose`, é possível provisionar todo o ecossistema com um único comando, eliminando o clássico problema de "na minha máquina funciona" e dispensando a instalação prévia de SDKs e bancos locais.
 
+* 🧪 Qualidade e Confiabilidade com Testes Automatizados:
+  * Criação de Testes Unitários utilizando Mocks (ex: Mockito) para isolar a camada de serviços e validar as regras de negócio de forma rápida, independente e sem depender de infraestrutura externa.
+  * Utilização de Testcontainers para testes de integração. A ferramenta sobe instâncias reais e efêmeras do PostgreSQL via Docker durante a execução dos testes, garantindo altíssima fidelidade ao validar as integrações e queries nativas, substituindo o uso de bancos em memória limitados (como o H2).
+
 ---
 
 ## 📋 Sumário
@@ -245,6 +249,15 @@ Para facilitar a avaliação, o banco de dados é iniciado com um usuário padr�
 
 ---
 
+# 🛠️ Como Executar os Testes
+Para executar as suítes de testes localmente (você precisará ter o Java instalado na máquina ou na IDE):
+- **Todos os testes (Unitários e de Integração):** 
+  Como os testes de integração requerem o Docker instalado na máquina (para o Testcontainers levantar o Postgres temporário), certifique-se que o serviço Docker da sua máquina (Docker Desktop) esteja em execução.
+  ```bash
+   ./mvnw test
+   ```
+
+---
 ## 🔐 Variáveis de Ambiente
 
 | Variable     | Description                    | Default                    |
