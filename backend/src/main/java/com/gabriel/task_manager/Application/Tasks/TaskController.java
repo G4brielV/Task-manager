@@ -53,7 +53,7 @@ public class TaskController {
             @AuthenticationPrincipal JWTUserData jwtUserData,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) String search,
-            @ParameterObject @PageableDefault(size = 10, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(size = 10, sort = "created_date", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<TaskResponse> page = taskService.listTasks(jwtUserData, status, search, pageable);
         return ResponseEntity.ok(page);

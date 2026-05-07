@@ -3,8 +3,8 @@ spring:
     name: task-manager
   datasource:
     url: jdbc:postgresql://localhost:5433/task_manager?stringtype=unspecified
-    username: postgres
-    password: SenhaSQL
+    username: admin
+    password: SENHA_SQL
   jpa:
     hibernate:
       ddl-auto: validate

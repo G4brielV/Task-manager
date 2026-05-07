@@ -21,8 +21,8 @@ public class TaskService {
     private final UserRepository userRepository;
 
     public Page<TaskResponse> listTasks(JWTUserData jwtUserData, TaskStatus status, String search, Pageable pageable) {
-        return taskRepository
-                .findAll(TaskSpecification.byFilters(jwtUserData.id(), status, search), pageable)
+        String statusStr = (status != null) ? status.name() : null;
+        return taskRepository.findTasksByFilters(jwtUserData.id(), status, search, pageable)
                 .map(TaskMapper::toTaskResponse);
     }
 

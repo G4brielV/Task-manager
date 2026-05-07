@@ -59,9 +59,9 @@ const TaskboardPage: React.FC = () => {
       const params: GetTasksParams = {
         status: status === 'ALL' ? undefined : status,
         search: search || undefined,
-        page: page - 1, // Spring pages are 0-indexed
+        page: page - 1, 
         size,
-        sort: 'createdDate,desc',
+        sort: 'created_date,desc',
       };
       const res = await taskService.getTasks(params);
       setTasks(res.content);
